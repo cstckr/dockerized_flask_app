@@ -3,6 +3,7 @@
    <body>
      <main>
          <h1> Convert SMILES to 2D structure </h1>
+         <p> Welcome, you are currently logged in as: {{username}}</p>
          <p> 
              This is a test app. Input a SMILES string and 
              the associated 2D structure will be displayed upon submission. </br>
@@ -12,6 +13,14 @@
          <label> Insert SMILES string: </label>
          <input type="text" name="name">
          <button type="submit"> Submit </button>
+         
+         </br>
+         </br>
+         <a href="{{url_for('logout')}}"> Log out </a> 
+         </br>
+         <a href="{{url_for('change_password')}}"> Change password </a> 
+         </br>
+         
          <p> <small> by cstckr </small> </p>
      </main>      
    </body>
