@@ -1,18 +1,19 @@
-from forms.authentication_forms import LoginForm, ChangePasswordForm
-from helper_functions.main import smiles_to_base64_img
-from flask import Flask, render_template, request, redirect, url_for, session
-from flask_login import (UserMixin, login_user, LoginManager, login_required,
+from extra.forms import LoginForm, ChangePasswordForm
+from extra.users import User, Base
+from extra.functions import smiles_to_base64_img
+from flask import (Flask, render_template, request, redirect, url_for,
+                   session, flash)
+from flask_login import (login_user, LoginManager, login_required,
                          logout_user, current_user)
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
-from sqlalchemy.ext.automap import automap_base
 from datetime import timedelta
 
 
 app = Flask(__name__)
 db = SQLAlchemy(app)
 flask_bcrypt = Bcrypt(app)
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///user_database1.db"
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database1.db"
 app.config["SECRET_KEY"] = "notasafekey"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
@@ -28,16 +29,6 @@ def load_user(user_id):
     return db.session.query(User).get(int(user_id))
 
 
-Base = automap_base()
-
-
-class User(Base, UserMixin):
-    __tablename__ = 'user'
-
-    def get_id(self):
-        return self.user_id
-
-
 Base.prepare(db.engine, reflect=True)
 
 
@@ -50,7 +41,6 @@ def make_session_permanent():
 @app.route("/", methods=["GET", "POST"])
 def login():
     form = LoginForm()
-    # temp = Base.prepare(db.engine, reflect=True)
 
     user = db.session.query(User).filter_by(
         username=form.username.data).first()
@@ -58,6 +48,8 @@ def login():
         if flask_bcrypt.check_password_hash(user.password, form.password.data):
             login_user(user)
             return redirect(url_for("main"))
+        else:
+            flash("Invalid username or password")
     return render_template("login.html", form=form)
 
 
@@ -72,12 +64,10 @@ def logout():
 @login_required
 def change_password():
     form = ChangePasswordForm()
-    if form.old_password.data is not None:
+    if form.validate_on_submit():
         condition1 = flask_bcrypt.check_password_hash(current_user.password,
                                                       form.old_password.data)
-        condition2 = (form.new_password1.data == form.new_password2.data)
-        condition3 = (form.new_password1.data is not None)
-        if condition1 & condition2 & condition3:
+        if condition1:
             new_password_hash = flask_bcrypt.generate_password_hash(
                 form.new_password1.data).decode("utf-8")
             db.session.query(User).filter_by(
@@ -85,16 +75,18 @@ def change_password():
                     dict(password=new_password_hash))
             db.session.commit()
             return redirect(url_for("main"))
+        else:
+            flash("Old password is incorrect")
     return render_template("change_password.html", form=form)
 
 
-@app.route("/main")
+@app.route("/main", methods=["GET", "POST"])
 @login_required
 def main():
     return render_template("main.html", username=current_user.username)
 
 
-@app.route("/output", methods=["POST"])
+@app.route("/output", methods=["GET", "POST"])
 @login_required
 def output():
     name = request.form.get("name")

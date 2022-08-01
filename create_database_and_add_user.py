@@ -33,5 +33,5 @@ def add_user(database, username, password):
         print(error)
 
 
-create_database("user_database1.db")
-add_user("user_database1.db", "guest", "topsecret")
+create_database("database1.db")
+add_user("database1.db", "guest", "topsecret")
