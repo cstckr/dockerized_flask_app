@@ -5,7 +5,7 @@ Base = automap_base()
 
 
 class User(Base, UserMixin):
-    __tablename__ = 'user'
+    __tablename__ = "user"
 
     def get_id(self):
         return self.user_id

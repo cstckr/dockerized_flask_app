@@ -9,16 +9,16 @@
              the associated 2D structure will be displayed upon submission. </br>
              Example SMILES string: c1ccccc1 for benzene
          </p> 
-         <form method="post" action="{{url_for('output')}}">
+         <form method="post" action="{{url_for('index.output')}}">
          <label> Insert SMILES string: </label>
          <input type="text" name="name">
          <button type="submit"> Submit </button>
          
          </br>
          </br>
-         <a href="{{url_for('logout')}}"> Log out </a> 
+         <a href="{{url_for('authentication.logout')}}"> Log out </a> 
          </br>
-         <a href="{{url_for('change_password')}}"> Change password </a> 
+         <a href="{{url_for('authentication.change_password')}}"> Change password </a> 
          </br>
          
          <p> <small> by cstckr </small> </p>
