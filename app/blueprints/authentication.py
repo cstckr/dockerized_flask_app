@@ -1,10 +1,8 @@
-from flask import Blueprint
-from extra.forms import LoginForm
+from flask import Blueprint, render_template, redirect, url_for, flash
+from extra.forms import LoginForm, ChangePasswordForm
 from extra.models import User
 from extra.extensions import db, flask_bcrypt
-from flask import render_template, redirect, url_for, flash
 from flask_login import login_user, logout_user, login_required, current_user
-from extra.forms import ChangePasswordForm
 
 authentication = Blueprint("authentication", __name__)
 
