@@ -16,13 +16,16 @@ This app implements an authentication procces around an Azure SQL user database.
  - Install the [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli)
  - In Azure, go to the "Container registries" service and create a registry
  - In a command terminal, go to your repository folder and run following commands:
+
+```
         docker run -dit ubuntu sh
-		docker image build -t docker-app .
-		az login
-		az acr login --name YOURLOGINSERVER.azurecr.io
-		docker tag docker-app YOURLOGINSERVER.azurecr.io/testapp
-		docker push YOURLOGINSERVER.azurecr.io/testapp
-		
+        docker image build -t docker-app .
+        az login
+        az acr login --name YOURLOGINSERVER.azurecr.io
+        docker tag docker-app YOURLOGINSERVER.azurecr.io/testapp         
+        docker push YOURLOGINSERVER.azurecr.io/testapp
+```
+	
  - In your Azure container registry, make sure to enable "Admin user" in the "Update" tab 
 
 - In Azure, go to the "App Services" service and create the app service by selecting your docker image from the Azure container registry.
