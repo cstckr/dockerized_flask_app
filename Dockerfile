@@ -1,6 +1,6 @@
 FROM python:3.9.12-bullseye
-WORKDIR /23_deployment
-ADD . /23_deployment
+WORKDIR /app
+ADD . /app
 
 ENV PATH="/root/miniconda3/bin:${PATH}"
 ARG PATH="/root/miniconda3/bin:${PATH}"
@@ -13,9 +13,22 @@ RUN wget \
     && mkdir /root/.conda \
     && bash Miniconda3-latest-Linux-x86_64.sh -b \
     && rm -f Miniconda3-latest-Linux-x86_64.sh 
-RUN conda --version
 
+ENV ACCEPT_EULA=Y
+RUN apt-get update -y \
+  && apt-get update \
+  && apt-get install -y --no-install-recommends curl unixodbc libpq-dev gcc g++ gnupg unixodbc-dev
+
+RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
+  && curl https://packages.microsoft.com/config/debian/11/prod.list > /etc/apt/sources.list.d/mssql-release.list \
+  && apt-get update \
+  && apt-get install -y --no-install-recommends --allow-unauthenticated msodbcsql17 mssql-tools \
+  && echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bash_profile \
+  && echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bashrc
 
 RUN pip install -r requirements.txt
 RUN conda install -c conda-forge rdkit==2020.09.3
-CMD ["flask", "run", "-h", "0.0.0.0", "-p", "5000"]
+
+EXPOSE 80
+
+CMD ["python", "app.py"]
